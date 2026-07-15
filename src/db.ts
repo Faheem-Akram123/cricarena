@@ -4,7 +4,7 @@
  */
 
 import { Team, Player, Tournament, Match, Settings } from './types';
-import { initialTeams, initialPlayers, initialTournaments, initialMatches, defaultSettings } from './defaultData';
+import { defaultSettings } from './defaultData';
 
 export const DB = {
   get<T>(key: string, defaultValue: T): T {
@@ -32,18 +32,28 @@ export const DB = {
 
   init(): void {
     if (!localStorage.getItem('cric_init')) {
-      DB.set<Team[]>('teams', initialTeams);
-      DB.set<Player[]>('players', initialPlayers);
-      DB.set<Tournament[]>('tournaments', initialTournaments);
-      DB.set<Match[]>('matches', initialMatches);
+      // REQUIREMENT: Initialize with empty arrays (No default demo data)
+      DB.set<Team[]>('teams', []);
+      DB.set<Player[]>('players', []);
+      DB.set<Tournament[]>('tournaments', []);
+      DB.set<Match[]>('matches', []);
       DB.set<Settings>('settings', defaultSettings);
-      DB.set<string | null>('liveMatchId', 'm1');
+      DB.set<string | null>('liveMatchId', null);
       DB.set<boolean>('init', true);
+      localStorage.removeItem('cric_unlocked');
     }
   },
 
+  setAuthStatus(isUnlocked: boolean): void {
+    localStorage.setItem('cric_unlocked', isUnlocked ? 'true' : 'false');
+  },
+
+  getAuthStatus(): boolean {
+    return localStorage.getItem('cric_unlocked') === 'true';
+  },
+
   getTeams(): Team[] {
-    return DB.get<Team[]>('teams', initialTeams);
+    return DB.get<Team[]>('teams', []);
   },
 
   setTeams(teams: Team[]): void {
@@ -51,7 +61,7 @@ export const DB = {
   },
 
   getPlayers(): Player[] {
-    return DB.get<Player[]>('players', initialPlayers);
+    return DB.get<Player[]>('players', []);
   },
 
   setPlayers(players: Player[]): void {
@@ -59,7 +69,7 @@ export const DB = {
   },
 
   getTournaments(): Tournament[] {
-    return DB.get<Tournament[]>('tournaments', initialTournaments);
+    return DB.get<Tournament[]>('tournaments', []);
   },
 
   setTournaments(tournaments: Tournament[]): void {
@@ -67,7 +77,7 @@ export const DB = {
   },
 
   getMatches(): Match[] {
-    return DB.get<Match[]>('matches', initialMatches);
+    return DB.get<Match[]>('matches', []);
   },
 
   setMatches(matches: Match[]): void {
@@ -83,7 +93,7 @@ export const DB = {
   },
 
   getLiveMatchId(): string | null {
-    return DB.get<string | null>('liveMatchId', 'm1');
+    return DB.get<string | null>('liveMatchId', null);
   },
 
   setLiveMatchId(id: string | null): void {
